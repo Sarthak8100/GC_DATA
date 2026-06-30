@@ -1,0 +1,62 @@
+[
+  {
+    "question": "Which channel uploaded the most videos?",
+    "tags": ["upload", "channel", "count", "ranking"],
+    "sql": "SELECT c.Channel_Name, COUNT(*) AS total_uploads FROM fact_input_video_operations f JOIN dim_channel_client c ON f.Channel_ID = c.Channel_ID GROUP BY c.Channel_Name ORDER BY total_uploads DESC LIMIT 10",
+    "filters_applied": ["Grouped by Channel Name", "Ordered by upload count descending", "Top 10"]
+  },
+  {
+    "question": "How many videos were uploaded in March 2025?",
+    "tags": ["upload", "date", "month", "count"],
+    "sql": "SELECT COUNT(*) AS total_uploads FROM fact_input_video_operations f JOIN dim_date d ON f.Upload_Date_ID = d.Date_ID WHERE d.Month = 3 AND d.Year = 2025",
+    "filters_applied": ["Month = March (3)", "Year = 2025"]
+  },
+  {
+    "question": "How many Key moments clips were processed?",
+    "tags": ["output", "output_type", "count", "processed"],
+    "sql": "SELECT COUNT(*) AS total FROM fact_output_video_operations fo JOIN dim_output_type ot ON fo.Output_Type_ID = ot.Output_Type_ID WHERE ot.Output_Type = 'Key moments'",
+    "filters_applied": ["Output Type = Key moments"]
+  },
+  {
+    "question": "Show me the upload to publish funnel per channel",
+    "tags": ["funnel", "upload", "processed", "published", "channel", "pipeline"],
+    "sql": "SELECT c.Channel_Name, COUNT(DISTINCT fi.Fact_Input_ID) AS uploaded, COUNT(DISTINCT fo.Fact_Output_ID) AS processed, COUNT(DISTINCT fp.Fact_Publish_ID) AS published FROM dim_channel_client c LEFT JOIN fact_input_video_operations fi ON c.Channel_ID = fi.Channel_ID LEFT JOIN fact_output_video_operations fo ON fi.Fact_Input_ID = fo.Fact_Input_ID LEFT JOIN fact_publish_information fp ON fo.Fact_Output_ID = fp.Fact_Output_ID GROUP BY c.Channel_Name ORDER BY uploaded DESC",
+    "filters_applied": ["All 3 pipeline stages joined", "Grouped by Channel Name", "LEFT JOINs used to include all channels"]
+  },
+  {
+    "question": "Which platforms have the most billable published videos?",
+    "tags": ["publish", "platform", "billable", "count", "ranking"],
+    "sql": "SELECT p.Platform_Name, COUNT(*) AS billable_count FROM fact_publish_information fp JOIN dim_platform p ON fp.Platform_ID = p.Platform_ID WHERE fp.Is_Billable = 'True' GROUP BY p.Platform_Name ORDER BY billable_count DESC",
+    "filters_applied": ["Is_Billable = True", "Grouped by Platform", "Ordered descending"]
+  },
+  {
+    "question": "How many videos were uploaded per language?",
+    "tags": ["upload", "language", "count", "breakdown"],
+    "sql": "SELECT l.Language_Name, COUNT(*) AS total FROM fact_input_video_operations f JOIN dim_language l ON f.Language_ID = l.Language_ID GROUP BY l.Language_Name ORDER BY total DESC",
+    "filters_applied": ["Grouped by Language"]
+  },
+  {
+    "question": "Which user uploaded the most videos?",
+    "tags": ["upload", "user", "count", "ranking"],
+    "sql": "SELECT u.User_Name, u.Team_Name, COUNT(*) AS total_uploads FROM fact_input_video_operations f JOIN dim_user_team u ON f.User_ID = u.User_ID GROUP BY u.User_Name, u.Team_Name ORDER BY total_uploads DESC LIMIT 10",
+    "filters_applied": ["Grouped by User and Team", "Top 10"]
+  },
+  {
+    "question": "What are the most common errors in data quality?",
+    "tags": ["data_quality", "error", "count", "issues"],
+    "sql": "SELECT Error_Type, COUNT(*) AS occurrences FROM fact_data_quality GROUP BY Error_Type ORDER BY occurrences DESC",
+    "filters_applied": ["Grouped by Error Type"]
+  },
+  {
+    "question": "How many videos were published to Instagram?",
+    "tags": ["publish", "platform", "instagram", "count"],
+    "sql": "SELECT COUNT(*) AS instagram_publishes FROM fact_publish_information fp JOIN dim_platform p ON fp.Platform_ID = p.Platform_ID WHERE p.Platform_Name = 'Instagram'",
+    "filters_applied": ["Platform = Instagram"]
+  },
+  {
+    "question": "Show monthly upload trend for 2025",
+    "tags": ["upload", "trend", "monthly", "time-series", "2025"],
+    "sql": "SELECT d.Month, d.Year, COUNT(*) AS total_uploads FROM fact_input_video_operations f JOIN dim_date d ON f.Upload_Date_ID = d.Date_ID WHERE d.Year = 2025 GROUP BY d.Year, d.Month ORDER BY d.Month",
+    "filters_applied": ["Year = 2025", "Grouped by Month", "Time series"]
+  }
+]
